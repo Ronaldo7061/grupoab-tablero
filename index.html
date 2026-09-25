@@ -262,8 +262,8 @@ const state={u:CONS,m:D.corteVentas.slice(0,7),day:null,tab:'resumen',scen:null,
 /* ---------- formato ---------- */
 const nf0=new Intl.NumberFormat('es-MX',{maximumFractionDigits:0});
 const money2=v=>v==null?'—':'$'+v.toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2});
-const money=v=>v==null||isNaN(v)?'—':'$'+nf0.format(Math.round(v));
-const moneyC=v=>{if(v==null)return'—';const a=Math.abs(v);return a>=1e6?'$'+(v/1e6).toLocaleString('es-MX',{maximumFractionDigits:2,minimumFractionDigits:1})+' M':a>=1e3?'$'+nf0.format(Math.round(v/1e3))+' mil':'$'+nf0.format(v)};
+const money=v=>v==null||isNaN(v)?'—':(Math.round(v)<0?'−':'')+'$'+nf0.format(Math.abs(Math.round(v)));
+const moneyC=v=>{if(v==null)return'—';if(v<0)return'−'+moneyC(-v);const a=Math.abs(v);return a>=1e6?'$'+(v/1e6).toLocaleString('es-MX',{maximumFractionDigits:2,minimumFractionDigits:1})+' M':a>=1e3?'$'+nf0.format(Math.round(v/1e3))+' mil':'$'+nf0.format(v)};
 const pct=(v,d=1)=>v==null||!isFinite(v)?'—':(v*100).toLocaleString('es-MX',{maximumFractionDigits:d,minimumFractionDigits:d})+'%';
 const num=v=>v==null?'—':nf0.format(Math.round(v));
 const mLabel=m=>{const[y,mm]=m.split('-');return MESES[+mm-1]+' '+y};
@@ -524,10 +524,10 @@ function renderGastos(){
       <div class="toolbar" style="margin-top:-4px"><span class="status" id="gStat"></span><button class="btn" id="gReset">Restablecer premisas del archivo</button></div>
       <div class="tscroll"><table class="gt"><thead><tr><th class="hide-m">Cuenta</th><th>Rubro</th><th class="hide-m">Clasificación 3</th><th class="r">Premisa</th><th class="r hide-m cA">Disponible al día ${day}</th><th class="r" id="thC"></th></tr></thead><tbody>
       ${D.prem.map((p,r)=>`<tr><td class="hide-m cta">${p.c}</td><td><span class="cta-m">${p.c}</span><b style="font-weight:600">${p.d}</b><span class="cta-m">${p.g}</span></td><td class="hide-m cla">${p.g}</td>
-        <td class="r">${edit?`<span class="pwrap"><input class="pin" type="number" min="0" max="100" step="0.1" data-r="${r}" aria-label="Premisa ${p.d} en porcentaje" value="${+(state.scen[r][iu]*100).toFixed(2)}">%</span>`:`<span id="gp${r}"></span>`}</td>
+        <td class="r">${edit?`<span class="pwrap"><input class="pin" type="number" min="-100" max="100" step="0.1" data-r="${r}" aria-label="Premisa ${p.d} en porcentaje" value="${+(state.scen[r][iu]*100).toFixed(2)}">%</span>`:`<span id="gp${r}"></span>`}</td>
         <td class="r hide-m cA" id="ga${r}"></td><td class="r" id="gc${r}"></td></tr>`).join('')}
       <tr class="tot"><td class="hide-m"></td><td>Total premisas</td><td class="hide-m"></td><td class="r" id="gpT"></td><td class="r hide-m cA" id="gaT"></td><td class="r" id="gcT"></td></tr></tbody></table></div>
-      <p class="src">Cuenta, rubro y clasificación: hoja PREMISAS del archivo de captura de operación. Premisas: % sobre la venta mensual de cada restaurante. Referencia de otros gastos operativos en México: 5% a 10% de la venta.</p></div></section>
+      <p class="src">Cuenta, rubro y clasificación: hoja PREMISAS del archivo de captura de operación. Premisas: % sobre la venta mensual de cada restaurante, en el mismo orden que la hoja. Los porcentajes negativos (ajustes de inventario y contracuentas) restan del disponible.</p></div></section>
   <section class="block"><div class="bh"><h2>¿Cuánto hay que vender para gastar lo que necesitas?</h2><p>Elige un rubro y escribe el monto que quieres gastar este mes. El cálculo usa la premisa vigente en la tabla de arriba.</p></div>
     <div class="panel">${edit?`<div class="calc"><div class="fgrid" style="grid-template-columns:1fr">
         <div><label class="fl" for="cR">Rubro</label><div class="sel"><select id="cR"><option value="-1">Todos los rubros (total de premisas)</option>${D.prem.map((p,r)=>`<option value="${r}" ${state.calc.r===r?'selected':''}>${p.c} · ${p.d}</option>`).join('')}</select></div></div>
@@ -539,7 +539,7 @@ function renderGastos(){
     $('gTxt').innerHTML=g.p?`Con <b>${money(g.A)}</b> vendidos del 1 al ${day}, las premisas (${pct(g.p)} de la venta) permiten gastar hasta <b>${money(g.gA)}</b>. ${state.gb==='acum'?'':`Con ${closeLbl().toLowerCase()} de ${money(g.C)}, el techo del mes sería <b>${money(g.gC)}</b>.`}`
       :`Las premisas ${edit&&isMod()?'del escenario':'del archivo'} están en 0%, por eso no hay gasto disponible. ${edit?'Escribe porcentajes en la tabla para simular un escenario.':'Elige un restaurante para simular un escenario.'}`;
     const Pj=cd?g.A/cd*dim(m):g.A;$('kA').textContent=moneyC(g.A);$('kCl').textContent=state.gb==='acum'?(cd?'Proyección al cierre (referencia)':'Venta del mes'):closeLbl();$('kC').textContent=moneyC(state.gb==='acum'?Pj:g.C);$('kCs').textContent=state.gb==='acum'?(cd?`Techo al cierre: ${moneyC(Pj*g.p)}`:'Venta registrada'):useMeta()?'Captura manual':cd?`Promedio diario × ${dim(m)} días`:'Venta registrada';
-    $('kP').textContent=pct(g.p);$('kPs').innerHTML=st?`<span class="chip ${st[0]}">${st[1]}</span>`:'Sin premisas capturadas';$('kG').textContent=moneyC(g.gC);
+    $('kP').textContent=pct(g.p);const fileP=edit?D.prem.reduce((a,p)=>a+(+p.v[iu]||0),0):null;$('kPs').textContent=!edit?'Ponderado por la venta de cada restaurante':(modCount()?`Archivo: ${pct(fileP)}`:'Premisas del archivo');$('kG').textContent=moneyC(g.gC);
     $('thC').textContent=state.gb==='acum'?`Disponible con venta al día ${day}`:useMeta()?'Disponible con monto capturado':cd?'Disponible al cierre':'Disponible con venta del mes';
     view.querySelectorAll('.cA').forEach(e=>e.style.display=state.gb==='acum'?'none':'');
     view.querySelectorAll('.seg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.gb===state.gb));$('kGl').textContent=state.gb==='acum'?'Gasto disponible hoy':'Techo de gasto del mes';$('kGs').textContent='Con '+closeLbl().toLowerCase();
@@ -555,7 +555,7 @@ function renderGastos(){
   function calcOut(g){
     const r=state.calc.r,amt=state.calc.amt,p=r<0?g.p:state.scen[r][iu],name=r<0?'el total de rubros':D.prem[r].d.toLowerCase(),o=$('cOut');
     if(!amt){o.innerHTML=`<p class="subk">Escribe un monto para ver la venta mensual que lo sostiene.</p>`;return}
-    if(!p){o.innerHTML=`<p class="res-line">${r<0?'Las premisas suman':'Este rubro tiene'} <b>0%</b> de premisa, así que ninguna venta lo cubre. Asígnale un porcentaje en la tabla de arriba para calcular.</p>`;return}
+    if(!(p>0)){o.innerHTML=`<p class="res-line">${r<0?'Las premisas suman':'Este rubro tiene'} <b>${pct(p||0,2)}</b> de premisa${p<0?' (es un ajuste que resta, no un gasto)':''}, así que ninguna venta lo sostiene. ${p<0?'Elige otro rubro.':'Asígnale un porcentaje en la tabla de arriba para calcular.'}</p>`;return}
     const need=amt/p,cap_=g.C*p,hol=cap_-amt,falta=need-g.A,rem=dim(m)-day,live=isPartial(m)&&day===corte.getDate(),dNow=g.A/day,dReq=rem>0?falta/rem:null;
     o.innerHTML=`<p class="subk" style="margin:0 0 4px">Venta mensual necesaria para gastar ${money(amt)} en ${name} (${pct(p,2)} de la venta)</p>
       <p class="res-big">${money(need)}</p>
@@ -563,7 +563,7 @@ function renderGastos(){
       <p class="res-line">${hol>=0?`Con ${closeLbl().toLowerCase()} (${money(g.C)}) el techo para ${name} es ${money(cap_)}: <b class="up">te sobran ${money(hol)}</b>.`:`Con ${closeLbl().toLowerCase()} (${money(g.C)}) el techo para ${name} es ${money(cap_)}: <b class="down">el gasto lo excede por ${money(-hol)}</b>.`}</p>
       ${falta<=0?`<p class="res-line"><b class="up">La venta acumulada ya cubre este gasto.</b></p>`:live&&rem>0?`<p class="res-line">Para lograrlo faltan <b>${money(falta)}</b>: <b>${money(dReq)} por día</b> en los ${rem} días restantes, contra ${money(dNow)} que se venden hoy en promedio (${dword(delta(dReq,dNow),'').trim()} por día).</p>`:''}`;
   }
-  view.querySelectorAll('.pin').forEach(el=>el.oninput=()=>{let v=parseFloat(el.value);if(isNaN(v)||v<0)v=0;if(v>100)v=100;state.scen[+el.dataset.r][iu]=v/100;upd()});
+  view.querySelectorAll('.pin').forEach(el=>el.oninput=()=>{let v=parseFloat(el.value);if(isNaN(v))v=0;if(v<-100)v=-100;if(v>100)v=100;state.scen[+el.dataset.r][iu]=v/100;upd()});
   $('gReset').onclick=()=>{initScen();renderGastos()};
   view.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{state.gb=b.dataset.gb;if($('gMeta')){$('gMeta').style.display=state.gb==='meta'?'':'none';if(state.gb==='meta')$('gMeta').focus()}upd()});
   if($('gMeta'))$('gMeta').oninput=e=>{state.meta=Math.max(parseFloat(e.target.value)||0,0);upd()};
