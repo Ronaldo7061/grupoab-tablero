@@ -166,6 +166,9 @@ td .lvl{font-size:11.5px;color:var(--soft);font-weight:500}
 .seg button:first-child{border-left:0}.seg button:hover{background:#EEF0FA}
 .seg button[aria-pressed="true"]{background:var(--navy);color:#fff}.seg button:focus-visible{outline:3px solid var(--blue);outline-offset:-3px}
 @media (max-width:980px){.seg{display:flex;width:100%}.seg button{flex:1;text-align:center;padding:9px 6px;font-size:12px}}
+.cla{font-size:13px;color:var(--ink)}
+.cta{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}.cta-m{display:none}
+@media (max-width:980px){.cta-m{display:block;font-size:11px;color:var(--soft);margin-bottom:2px}}
 svg text{font-family:'Montserrat',system-ui,sans-serif}
 .tip{position:fixed;pointer-events:none;background:var(--ink);color:#fff;font-size:12.5px;padding:7px 10px;border-radius:6px;opacity:0;transition:opacity .12s;z-index:20;white-space:nowrap}
 .tip b{font-weight:700}
@@ -519,15 +522,15 @@ function renderGastos(){
         <div class="seg" role="group" aria-label="Venta base"><button data-gb="acum">Venta acumulada al día ${day}</button><button data-gb="proj">${cd?'Proyección al cierre':'Venta del mes'}</button>${edit?'<button data-gb="meta">Otro monto</button>':''}</div>
         ${edit?`<input id="gMeta" class="money-in" style="width:160px;padding:8px 10px;font-size:14px;${state.gb==='meta'?'':'display:none'}" type="number" min="0" step="10000" placeholder="Venta del mes" aria-label="Venta del mes para el escenario" value="${state.meta||''}">`:''}</div></div>
       <div class="toolbar" style="margin-top:-4px"><span class="status" id="gStat"></span><button class="btn" id="gReset">Restablecer premisas del archivo</button></div>
-      <div class="tscroll"><table class="gt"><thead><tr><th>Rubro</th><th class="r">Premisa</th><th class="r hide-m cA">Disponible al día ${day}</th><th class="r" id="thC"></th></tr></thead><tbody>
-      ${D.prem.map((p,r)=>`<tr><td><b style="font-weight:600">${p.d}</b><div class="lvl">${p.g}</div></td>
+      <div class="tscroll"><table class="gt"><thead><tr><th class="hide-m">Cuenta</th><th>Rubro</th><th class="hide-m">Clasificación 3</th><th class="r">Premisa</th><th class="r hide-m cA">Disponible al día ${day}</th><th class="r" id="thC"></th></tr></thead><tbody>
+      ${D.prem.map((p,r)=>`<tr><td class="hide-m cta">${p.c}</td><td><span class="cta-m">${p.c}</span><b style="font-weight:600">${p.d}</b><span class="cta-m">${p.g}</span></td><td class="hide-m cla">${p.g}</td>
         <td class="r">${edit?`<span class="pwrap"><input class="pin" type="number" min="0" max="100" step="0.1" data-r="${r}" aria-label="Premisa ${p.d} en porcentaje" value="${+(state.scen[r][iu]*100).toFixed(2)}">%</span>`:`<span id="gp${r}"></span>`}</td>
         <td class="r hide-m cA" id="ga${r}"></td><td class="r" id="gc${r}"></td></tr>`).join('')}
-      <tr class="tot"><td>Total premisas</td><td class="r" id="gpT"></td><td class="r hide-m cA" id="gaT"></td><td class="r" id="gcT"></td></tr></tbody></table></div>
-      <p class="src">Premisas: hoja Premisas del archivo, % sobre la venta mensual de cada restaurante. Referencia de otros gastos operativos en México: 5% a 10% de la venta.</p></div></section>
+      <tr class="tot"><td class="hide-m"></td><td>Total premisas</td><td class="hide-m"></td><td class="r" id="gpT"></td><td class="r hide-m cA" id="gaT"></td><td class="r" id="gcT"></td></tr></tbody></table></div>
+      <p class="src">Cuenta, rubro y clasificación: hoja PREMISAS del archivo de captura de operación. Premisas: % sobre la venta mensual de cada restaurante. Referencia de otros gastos operativos en México: 5% a 10% de la venta.</p></div></section>
   <section class="block"><div class="bh"><h2>¿Cuánto hay que vender para gastar lo que necesitas?</h2><p>Elige un rubro y escribe el monto que quieres gastar este mes. El cálculo usa la premisa vigente en la tabla de arriba.</p></div>
     <div class="panel">${edit?`<div class="calc"><div class="fgrid" style="grid-template-columns:1fr">
-        <div><label class="fl" for="cR">Rubro</label><div class="sel"><select id="cR"><option value="-1">Todos los rubros (total de premisas)</option>${D.prem.map((p,r)=>`<option value="${r}" ${state.calc.r===r?'selected':''}>${p.d}</option>`).join('')}</select></div></div>
+        <div><label class="fl" for="cR">Rubro</label><div class="sel"><select id="cR"><option value="-1">Todos los rubros (total de premisas)</option>${D.prem.map((p,r)=>`<option value="${r}" ${state.calc.r===r?'selected':''}>${p.c} · ${p.d}</option>`).join('')}</select></div></div>
         <div><label class="fl" for="cA">Monto que quieres gastar en el mes</label><input id="cA" class="money-in" type="number" min="0" step="1000" placeholder="$0" value="${state.calc.amt||''}"></div></div>
       <div id="cOut" aria-live="polite"></div></div>`:`<p class="subk" style="margin:0">Elige un restaurante en el filtro para usar la calculadora: cada uno tiene sus propias premisas.</p>`}</div></section>`;
   const upd=()=>{
