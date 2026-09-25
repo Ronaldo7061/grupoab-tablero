@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Grupo AB · Tablero de ventas y nómina · CLARIUM</title>
+<link rel="icon" href="assets/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#00008A; --blue:#0077FF; --orange:#F1571E; --amber:#F7931E;
+  --ink:#141A45; --muted:#5B6285; --soft:#8A90AE; --line:#DDE1EE; --line2:#EEF0F6;
+  --bg:#F3F5FA; --surface:#FFFFFF; --blue-tint:#E6F1FF; --orange-tint:#FEEDE6;
+  --radius:10px;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:'Montserrat',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;color:var(--ink);background:var(--bg);
+  font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums lining-nums}
+button,select{font-family:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+
+/* ---------- encabezado ---------- */
+.top{background:var(--navy);color:#fff;border-bottom:4px solid var(--orange)}
+.top-in{max-width:1320px;margin:0 auto;padding:18px 28px;display:flex;align-items:center;gap:18px}
+.top img{width:46px;height:auto;display:block}
+.top h1{font-size:19px;font-weight:700;margin:0;letter-spacing:.1px}
+.top p{margin:2px 0 0;font-size:13px;color:#C9CCF2}
+.top .stamp{margin-left:auto;text-align:right;font-size:12px;color:#C9CCF2;line-height:1.45}
+.top .stamp b{color:#fff;font-weight:600}
+
+/* ---------- estructura ---------- */
+.wrap{max-width:1320px;margin:0 auto;padding:28px;display:grid;grid-template-columns:272px 1fr;gap:36px;align-items:start}
+aside{position:sticky;top:20px}
+.flabel{font-size:13px;font-weight:600;color:var(--ink);margin:0 0 8px}
+.units{display:flex;flex-direction:column;gap:2px;margin-bottom:26px}
+.unit{all:unset;cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:9px 12px;border-radius:8px;font-size:14px;color:var(--muted);font-weight:500}
+.unit:hover{background:#E8EBF5;color:var(--ink)}
+.unit[aria-pressed="true"]{background:var(--navy);color:#fff;font-weight:600}
+.unit small{font-size:11px;opacity:.75;font-weight:500}
+.unit:focus-visible{outline:3px solid var(--blue)}
+.sel{position:relative}
+.sel select{appearance:none;width:100%;padding:10px 32px 10px 12px;font-size:13.5px;text-overflow:ellipsis;font-weight:600;border:1.5px solid var(--line);border-radius:8px;background:#fff;cursor:pointer}
+.sel select:hover{border-color:var(--blue)}
+.sel::after{content:"";position:absolute;right:15px;top:50%;width:8px;height:8px;border-right:2px solid var(--navy);border-bottom:2px solid var(--navy);transform:translateY(-70%) rotate(45deg);pointer-events:none}
+.fnote{font-size:12px;color:var(--soft);margin-top:10px;line-height:1.5}
+.aside-foot{margin-top:30px;padding-top:18px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);line-height:1.55}
+.aside-foot b{color:var(--ink);font-weight:600}
+
+/* ---------- pestañas ---------- */
+.tabs{display:flex;gap:28px;border-bottom:1px solid var(--line);margin-bottom:28px}
+.tab{all:unset;cursor:pointer;padding:0 2px 12px;font-size:15px;font-weight:600;color:var(--soft);border-bottom:3px solid transparent;margin-bottom:-1px}
+.tab:hover{color:var(--ink)}
+.tab[aria-selected="true"]{color:var(--navy);border-bottom-color:var(--orange)}
+.tab:focus-visible{outline:3px solid var(--blue);outline-offset:4px}
+
+/* ---------- lectura principal ---------- */
+.lede{margin-bottom:8px}.lede.split{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:40px;align-items:end}
+.wrap>*{min-width:0}
+.kicker{font-size:14px;color:var(--muted);font-weight:500;margin:0 0 2px}
+.big{font-size:clamp(40px,5.4vw,62px);font-weight:800;color:var(--orange);line-height:1.02;letter-spacing:-1.2px;margin:0}
+.big.navy{color:var(--navy)}
+.lede-text{font-size:15px;color:var(--ink);margin:12px 0 0;max-width:62ch}
+.lede-text b{font-weight:700}
+.up{color:#0A6BD8;font-weight:700}.down{color:var(--orange);font-weight:700}
+
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin:30px 0 8px;border-bottom:2px solid var(--orange);padding-bottom:22px}
+.kpi{padding:0 18px;border-left:1px solid var(--line)}
+.kpi:first-child{padding-left:0;border-left:0}
+.kpi .l{font-size:12.5px;color:var(--muted);font-weight:500;margin-bottom:4px;line-height:1.35}
+.kpi .v{font-size:25px;font-weight:700;color:var(--navy);letter-spacing:-.3px;line-height:1.15}
+.kpi .v.o{color:var(--orange)}
+.kpi .s{font-size:12px;color:var(--soft);margin-top:3px}
+
+section.block{margin-top:40px}
+.bh{margin-bottom:14px}
+.bh h2{font-size:18px;font-weight:700;margin:0;color:var(--ink);letter-spacing:-.1px}
+.bh p{font-size:13.5px;color:var(--muted);margin:4px 0 0;max-width:75ch}
+.panel{background:var(--surface);border-radius:var(--radius);padding:22px 24px;border:1px solid var(--line2)}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px}
+.src{font-size:11.5px;color:var(--soft);margin-top:10px}
+
+/* barras horizontales */
+.hrow{display:grid;grid-template-columns:150px 1fr 118px;align-items:center;gap:16px;padding:11px 6px;border-bottom:1px solid var(--line2);cursor:pointer;border-radius:6px}
+.hrow:last-child{border-bottom:0}
+.hrow:hover{background:#F6F8FD}
+.hrow .n{font-size:14px;font-weight:600}
+.hrow .n small{display:block;font-size:11.5px;color:var(--soft);font-weight:500}
+.track{height:12px;background:var(--line2);border-radius:6px;overflow:hidden}
+.fill{height:100%;background:var(--blue);border-radius:6px}
+.hrow.on .fill{background:var(--orange)}
+.hrow .val{text-align:right;font-weight:700;font-size:14.5px;color:var(--navy)}
+.hrow.on .val{color:var(--orange)}
+.hrow .val small{display:block;font-size:11.5px;font-weight:600}
+
+/* medidor nómina/venta */
+.gauge{margin-top:18px}
+.gscale{position:relative;height:16px;border-radius:8px;background:linear-gradient(90deg,#DDEBFF 0%,#DDEBFF 100%)}
+.gband{position:absolute;top:0;bottom:0;background:var(--navy);opacity:.18;border-radius:3px}
+.gcrit{position:absolute;top:0;bottom:0;right:0;background:var(--orange);opacity:.18;border-radius:0 8px 8px 0}
+.gpin{position:absolute;top:-7px;width:4px;height:30px;background:var(--orange);border-radius:2px;transform:translateX(-2px)}
+.gticks{position:relative;height:20px;font-size:11.5px;color:var(--soft);margin-top:6px}
+.gticks span{position:absolute;transform:translateX(-50%)}
+.chip{display:inline-block;font-size:12px;font-weight:700;padding:4px 10px;border-radius:20px}
+.chip.lo{background:var(--blue-tint);color:#0059C2}.chip.ok{background:#E6E6F6;color:var(--navy)}
+.chip.hi{background:#FEF1DF;color:#A55A00}.chip.cr{background:var(--orange-tint);color:#B83A0C}
+
+/* tabla puestos */
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;font-size:12px;font-weight:600;color:var(--muted);padding:0 10px 10px;border-bottom:1.5px solid var(--line)}
+td{padding:10px;border-bottom:1px solid var(--line2)}
+td.r{white-space:nowrap}
+.tscroll{overflow-x:auto}
+td.r,th.r{text-align:right}
+td .lvl{font-size:11.5px;color:var(--soft);font-weight:500}
+.dash{color:var(--soft)}
+.more{all:unset;cursor:pointer;margin-top:14px;font-size:13.5px;font-weight:600;color:var(--blue)}
+.more:hover{text-decoration:underline}
+
+/* niveles */
+.lv{display:grid;grid-template-columns:40px 1fr 70px 96px;gap:14px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line2)}
+.lv:last-child{border-bottom:0}
+.lv .code{font-weight:800;color:var(--navy);font-size:14px}
+.lv .nm{font-size:13.5px;font-weight:600}
+.lv .nm .track{margin-top:6px;height:8px}
+.lv .hc{text-align:right;font-weight:700;color:var(--navy)}
+.lv .hc small,.lv .pr small{display:block;font-size:11px;color:var(--soft);font-weight:500}
+.lv .pr{text-align:right;font-weight:600;font-size:13.5px}
+
+.empty{padding:40px 24px;text-align:center;color:var(--muted);background:var(--surface);border-radius:var(--radius);border:1px dashed var(--line)}
+.empty b{display:block;color:var(--ink);font-size:16px;margin-bottom:6px}
+.note{font-size:12.5px;color:var(--muted);background:#fff;border-left:3px solid var(--amber);padding:10px 14px;border-radius:0 6px 6px 0;margin-top:14px}
+
+
+.fgrid{display:grid;grid-template-columns:1fr;gap:16px}
+.fgrid .row2{display:grid;grid-template-columns:92px 1fr;gap:10px}
+.fl{font-size:12.5px;font-weight:600;color:var(--ink);margin:0 0 6px;display:block}
+.hl-row td{background:#FEF3EE}
+.hl-row td:first-child{box-shadow:inset 3px 0 0 var(--orange)}
+.pin{width:78px;padding:7px 8px;font:600 14px 'Montserrat',system-ui,sans-serif;text-align:right;border:1.5px solid var(--line);border-radius:6px;color:var(--navy);background:#fff}
+.pin:hover{border-color:var(--blue)}.pin.chg{border-color:var(--amber);background:#FFF8EF}
+.pwrap{display:inline-flex;align-items:center;gap:5px;font-weight:600;color:var(--muted)}
+.money-in{width:100%;padding:11px 12px;font:700 16px 'Montserrat',system-ui,sans-serif;border:1.5px solid var(--line);border-radius:8px;color:var(--navy)}
+.money-in:focus,.pin:focus{border-color:var(--blue);outline:none;box-shadow:0 0 0 3px #CFE4FF}
+.btn{all:unset;cursor:pointer;font-size:13px;font-weight:600;padding:8px 14px;border-radius:8px;border:1.5px solid var(--navy);color:var(--navy)}
+.btn:hover{background:var(--navy);color:#fff}.btn:focus-visible{outline:3px solid var(--blue)}
+.btn[disabled]{opacity:.35;pointer-events:none}
+.toolbar{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;margin-bottom:14px}
+.status{font-size:12.5px;font-weight:600;color:var(--muted)}.status.mod{color:#A55A00}
+.tot td{font-weight:800;color:var(--navy);border-top:1.5px solid var(--line);border-bottom:0}
+.calc{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:30px;align-items:start}
+.res-big{font-size:34px;font-weight:800;color:var(--orange);letter-spacing:-.6px;line-height:1.1}
+.res-line{font-size:14px;margin:10px 0 0;color:var(--ink)}
+.res-line b{font-weight:700}
+.subk{font-size:12.5px;color:var(--muted);font-weight:500}
+@media (max-width:980px){.fgrid{grid-template-columns:1fr;gap:12px}.tab{white-space:nowrap}.gt td,.gt th{padding:8px 5px}.gt .pin{width:56px}.gt .lvl{display:none}.calc{grid-template-columns:1fr}.pin{width:64px}}
+.nvc{display:inline-block;font-size:12px;font-weight:700;padding:3px 9px;border-radius:5px;white-space:nowrap;color:var(--ink)}
+.nv1{background:#FDE5DA}.nv2{background:#FEF0DC}.nv3{background:#E1EEFF}.nv4{background:#DCE2F6}.nv5{background:#E7E2F5}.nv6{background:#E4E6EE}
+.st td{padding:9px 10px}.nvm{display:none}
+@media (max-width:980px){.nvm{display:table;margin:4px 0 6px;font-size:11px}.st{font-size:12.5px}.st td,.st th{padding:8px 4px}}
+.basesel{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center}
+.seg{display:inline-flex;border:1.5px solid var(--navy);border-radius:8px;overflow:hidden}
+.seg button{all:unset;cursor:pointer;padding:8px 13px;font-size:13px;font-weight:600;color:var(--navy);border-left:1px solid var(--line)}
+.seg button:first-child{border-left:0}.seg button:hover{background:#EEF0FA}
+.seg button[aria-pressed="true"]{background:var(--navy);color:#fff}.seg button:focus-visible{outline:3px solid var(--blue);outline-offset:-3px}
+@media (max-width:980px){.seg{display:flex;width:100%}.seg button{flex:1;text-align:center;padding:9px 6px;font-size:12px}}
+svg text{font-family:'Montserrat',system-ui,sans-serif}
+.tip{position:fixed;pointer-events:none;background:var(--ink);color:#fff;font-size:12.5px;padding:7px 10px;border-radius:6px;opacity:0;transition:opacity .12s;z-index:20;white-space:nowrap}
+.tip b{font-weight:700}
+.legend{display:flex;gap:18px;font-size:12.5px;color:var(--muted);margin-bottom:6px;flex-wrap:wrap}
+.legend i{display:inline-block;width:18px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
+
+footer{max-width:1320px;margin:10px auto 0;padding:26px 28px 40px;display:flex;align-items:center;gap:22px;border-top:1px solid var(--line)}
+footer img{height:34px;width:auto}
+footer p{font-size:12px;color:var(--muted);margin:0;line-height:1.55}
+
+/* ---------- móvil ---------- */
+@media (max-width:980px){
+  .wrap{grid-template-columns:1fr;gap:18px;padding:18px}
+  aside{position:static}
+  .units{flex-direction:row;overflow-x:auto;gap:6px;margin-bottom:16px;padding-bottom:4px;scrollbar-width:none}
+  .unit{white-space:nowrap;background:#fff;border:1px solid var(--line)}
+  .unit small{display:none}
+  .aside-foot{display:none}
+  .lede.split{grid-template-columns:1fr;gap:10px}
+  footer{flex-direction:column;align-items:flex-start;padding:22px 18px 34px}
+  .kpis{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:18px}
+  .kpi:nth-child(3){padding-left:0;border-left:0}
+  .two{grid-template-columns:1fr}
+  .top-in{padding:14px 18px}
+  .top .stamp{display:none}
+  .hrow{grid-template-columns:104px 1fr 96px;gap:10px}
+  .panel{padding:16px 10px}
+  .tabs{gap:20px;overflow-x:auto}
+  .lv{grid-template-columns:34px 1fr 52px 84px;gap:10px}
+  .hide-m{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-in">
+    <img src="assets/logo-clarium-blanco.png" alt="CLARIUM">
+    <div>
+      <h1>Grupo AB · Tablero de ventas y nómina</h1>
+      <p>Claridad financiera para decisiones estratégicas</p>
+    </div>
+    <div class="stamp" id="stamp"></div>
+  </div>
+</header>
+
+<div class="wrap">
+  <aside aria-label="Filtros">
+    <div class="fgrid">
+      <div><label class="fl" for="fU">Restaurante</label><div class="sel"><select id="fU"></select></div></div>
+      <div class="row2">
+        <div><label class="fl" for="fY">Año</label><div class="sel"><select id="fY"></select></div></div>
+        <div><label class="fl" for="fM">Mes</label><div class="sel"><select id="fM"></select></div></div>
+      </div>
+      <div><label class="fl" for="fD">Venta acumulada al día</label><div class="sel"><select id="fD"></select></div></div>
+    </div>
+    <p class="fnote" id="mesnote"></p>
+    <div class="aside-foot">
+      <b>Solo consulta.</b> Los filtros y los escenarios de premisas cambian lo que ves en tu pantalla; no modifican las bases. Al recargar la página vuelven las premisas del archivo.
+      <p id="upd" style="margin:10px 0 0;color:var(--soft)"></p>
+    </div>
+  </aside>
+
+  <main>
+    <nav class="tabs" role="tablist" aria-label="Tableros">
+      <button class="tab" role="tab" data-tab="resumen">Resumen</button>
+      <button class="tab" role="tab" data-tab="ventas">Ventas</button>
+      <button class="tab" role="tab" data-tab="gastos">Gastos</button>
+      <button class="tab" role="tab" data-tab="nomina">Nómina y equipo</button>
+    </nav>
+    <div id="view"><div class="empty"><b>Cargando datos…</b>Un momento, por favor.</div></div>
+  </main>
+</div>
+
+<footer>
+  <img src="assets/logo-clarium-horizontal.png" alt="CLARIUM Claridad Financiera">
+  <p>Tablero preparado por CLARIUM para Grupo AB. Ventas: base diaria por restaurante. Nómina: CFDI de nómina (OneFactor). Los datos de nómina se muestran agregados por puesto y nivel; no se publican datos individuales.</p>
+</footer>
+<div class="tip" id="tip"></div>
+
+<script>
+function app(D){
+const MESES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+const MES3=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+const DIAS=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+const CONS=D.cons, U=D.unidades, SALES_U=D.conVenta;
+const corteN=new Date(D.corteNomina+'T12:00:00');const corteNTxt=`${corteN.getDate()} ${MES3[corteN.getMonth()]} ${corteN.getFullYear()}`;const corteNLargo=`${corteN.getDate()} de ${MESES[corteN.getMonth()]}`;
+const corte=new Date(D.corteVentas+'T12:00:00');
+const state={u:CONS,m:D.corteVentas.slice(0,7),day:null,tab:'resumen',scen:null,meta:0,calc:{r:-1,amt:0},gb:'proj'};
+
+/* ---------- formato ---------- */
+const nf0=new Intl.NumberFormat('es-MX',{maximumFractionDigits:0});
+const money2=v=>v==null?'—':'$'+v.toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2});
+const money=v=>v==null||isNaN(v)?'—':'$'+nf0.format(Math.round(v));
+const moneyC=v=>{if(v==null)return'—';const a=Math.abs(v);return a>=1e6?'$'+(v/1e6).toLocaleString('es-MX',{maximumFractionDigits:2,minimumFractionDigits:1})+' M':a>=1e3?'$'+nf0.format(Math.round(v/1e3))+' mil':'$'+nf0.format(v)};
+const pct=(v,d=1)=>v==null||!isFinite(v)?'—':(v*100).toLocaleString('es-MX',{maximumFractionDigits:d,minimumFractionDigits:d})+'%';
+const num=v=>v==null?'—':nf0.format(Math.round(v));
+const mLabel=m=>{const[y,mm]=m.split('-');return MESES[+mm-1]+' '+y};
+const mShort=m=>{const[y,mm]=m.split('-');return MES3[+mm-1]+' '+y.slice(2)};
+const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
+const shift=(m,k)=>{let[y,mm]=m.split('-').map(Number);mm+=k;while(mm<1){mm+=12;y--}while(mm>12){mm-=12;y++}return y+'-'+String(mm).padStart(2,'0')};
+const dim=m=>{const[y,mm]=m.split('-').map(Number);return new Date(y,mm,0).getDate()};
+const delta=(a,b)=>(b&&a!=null)?a/b-1:null;
+const dword=(d,ref)=>d==null?'':`<span class="${d>=0?'up':'down'}">${d>=0?'+':'−'}${pct(Math.abs(d))}</span> ${ref}`;
+
+/* ---------- datos de ventas ---------- */
+const V=D.ventas.map(r=>({u:r[0],d:r[1],m:r[1].slice(0,7),day:+r[1].slice(8,10),p:r[2],v:r[3]}));
+const uIdx=u=>u===CONS?null:U.indexOf(u);
+const hasSales=u=>u===CONS||SALES_U.includes(U.indexOf(u));
+function rows(u,m,maxDay){const i=uIdx(u);return V.filter(r=>(i==null?true:r.u===i)&&r.m===m&&(maxDay==null||r.day<=maxDay))}
+function agg(u,m,maxDay){const rs=rows(u,m,maxDay);const venta=rs.reduce((a,r)=>a+r.v,0),p=rs.reduce((a,r)=>a+r.p,0);
+  const dias=new Set(rs.map(r=>r.d)).size;return{venta,p,dias,ticket:p?venta/p:null,diaria:dias?venta/dias:null,n:rs.length}}
+function daily(u,m){const map={};rows(u,m).forEach(r=>{map[r.day]=(map[r.day]||0)+r.v});return map}
+const monthsAll=[...new Set(V.map(r=>r.m))].sort();
+const isPartial=m=>m===D.corteVentas.slice(0,7);
+const cutDay=m=>(state.day&&state.day<dim(m))?state.day:null;
+
+/* ---------- datos de nómina ---------- */
+const P=D.prod;
+const prodOf=(u,m)=>P.find(r=>r.u===u&&r.m===m);
+const nomMonths=[...new Set(P.map(r=>r.m))].sort();
+function nomMonthFor(m){const c=nomMonths.filter(x=>x<=m);return c.length?c[c.length-1]:null}
+function status(p){const b=D.bench;if(p==null)return null;
+  if(p<b.min)return['lo','Debajo del rango de referencia'];if(p<=b.max)return['ok','Dentro del rango de referencia'];
+  if(p<=b.crit)return['hi','Arriba del rango de referencia'];return['cr','Nivel crítico']}
+
+/* ---------- tooltip ---------- */
+const tip=document.getElementById('tip');
+document.addEventListener('mousemove',e=>{const t=e.target.closest('[data-tip]');if(!t){tip.style.opacity=0;return}
+  tip.innerHTML=t.dataset.tip;tip.style.opacity=1;const w=tip.offsetWidth;let x=e.clientX+14;if(x+w>innerWidth-8)x=e.clientX-w-14;tip.style.left=x+'px';tip.style.top=(e.clientY-40)+'px'});
+
+/* ---------- gráficas SVG ---------- */
+function niceMax(v){if(v<=0)return 1;const e=Math.pow(10,Math.floor(Math.log10(v)));const f=v/e;return([1,1.2,1.6,2,2.4,3,4,5,6,8,10].find(s=>f<=s))*e}
+function barChart(el,o){
+  const W=Math.max(el.clientWidth,280),H=o.h||250,m={t:18,r:10,b:30,l:58};const iw=W-m.l-m.r,ih=H-m.t-m.b;
+  const mx=niceMax(Math.max(...o.values.map(v=>v||0),o.avg||0)*1.05);const n=o.values.length,bw=iw/n,gap=Math.min(bw*.28,6);
+  const y=v=>m.t+ih-(v/mx)*ih;let s=`<svg width="${W}" height="${H}" role="img" aria-label="${o.aria||''}">`;
+  for(let k=0;k<=4;k++){const v=mx*k/4,yy=y(v);s+=`<line x1="${m.l}" x2="${W-m.r}" y1="${yy}" y2="${yy}" stroke="#EEF0F6"/><text x="${m.l-8}" y="${yy+4}" text-anchor="end" font-size="11" fill="#8A90AE">${moneyC(v).replace(' mil','k')}</text>`}
+  o.values.forEach((v,i)=>{const x=m.l+i*bw+gap/2,w=bw-gap;if(v==null){return}
+    const col=o.colors?o.colors[i]:'#0077FF';s+=`<rect x="${x}" y="${y(v)}" width="${w}" height="${Math.max(ih-(y(v)-m.t),0)}" rx="${Math.min(3,w/3)}" fill="${col}" data-tip="${o.tips[i]}"/>`;
+    if(o.vlabels)s+=`<text x="${x+w/2}" y="${y(v)-6}" text-anchor="middle" font-size="11" font-weight="700" fill="${col==='#F1571E'?'#F1571E':'#00008A'}">${moneyC(v).replace(' mil','k').replace(' M','M')}</text>`;
+    const every=n>20?(W<560?5:2):1;if(i%every===0||i===n-1)s+=`<text x="${x+w/2}" y="${H-10}" text-anchor="middle" font-size="11" fill="#5B6285">${o.labels[i]}</text>`});
+  if(o.avg){const yy=y(o.avg);s+=`<line x1="${m.l}" x2="${W-m.r}" y1="${yy}" y2="${yy}" stroke="#00008A" stroke-width="1.5" stroke-dasharray="5 4"/>${o.noAvgText?'':`<text x="${W-m.r}" y="${yy-6}" text-anchor="end" font-size="11.5" font-weight="700" fill="#00008A">Promedio ${moneyC(o.avg)}</text>`}`}
+  el.innerHTML=s+'</svg>'}
+function lineChart(el,o){
+  const W=Math.max(el.clientWidth,280),H=o.h||260,m={t:22,r:34,b:30,l:o.l||58},T=o.ticks||4;const iw=W-m.l-m.r,ih=H-m.t-m.b;
+  const all=o.series.flatMap(s=>s.values).filter(v=>v!=null);let mx=o.max||niceMax(Math.max(...all)*1.08),mn=o.min||0;
+  const n=o.labels.length,x=i=>m.l+(n===1?iw/2:i*iw/(n-1)),y=v=>m.t+ih-((v-mn)/(mx-mn))*ih;
+  let s=`<svg width="${W}" height="${H}" role="img" aria-label="${o.aria||''}">`;
+  if(o.band){s+=`<rect x="${m.l}" width="${iw}" y="${y(o.band[1])}" height="${y(o.band[0])-y(o.band[1])}" fill="#00008A" opacity=".08"/><text x="${m.l+6}" y="${y(o.band[1])+14}" font-size="11" fill="#00008A" font-weight="600">${o.bandLabel}</text>`}
+  for(let k=0;k<=T;k++){const v=mn+(mx-mn)*k/T,yy=y(v);s+=`<line x1="${m.l}" x2="${W-m.r}" y1="${yy}" y2="${yy}" stroke="#EEF0F6"/><text x="${m.l-8}" y="${yy+4}" text-anchor="end" font-size="11" fill="#8A90AE">${o.fy(v)}</text>`}
+  o.labels.forEach((l,i)=>{s+=`<text x="${x(i)}" y="${H-10}" text-anchor="middle" font-size="11" fill="#5B6285">${l}</text>`});
+  o.series.forEach(se=>{let d='';se.values.forEach((v,i)=>{if(v==null)return;d+=(d&&se.values[i-1]!=null?'L':'M')+x(i)+' '+y(v)});
+    s+=`<path d="${d}" fill="none" stroke="${se.color}" stroke-width="${se.w||2.5}" ${se.dash?'stroke-dasharray="6 5"':''} stroke-linejoin="round" stroke-linecap="round"/>`;
+    se.values.forEach((v,i)=>{if(v==null)return;const hl=se.hl===i;s+=`<circle cx="${x(i)}" cy="${y(v)}" r="${hl?6:3.5}" fill="${hl?'#F1571E':se.color}" stroke="#fff" stroke-width="${hl?2.5:1.5}"/><circle cx="${x(i)}" cy="${y(v)}" r="12" fill="transparent" data-tip="<b>${se.name}</b> · ${o.labels[i]}: ${o.ft(v)}"/>`;
+      if(hl)s+=`<text x="${x(i)}" y="${y(v)-13}" text-anchor="middle" font-size="12" font-weight="700" fill="#F1571E">${o.ft(v)}</text>`})});
+  el.innerHTML=s+'</svg>'}
+
+const uName=u=>u===CONS?'Grupo AB':D.short[u];
+const $=id=>document.getElementById(id);
+const view=$('view');
+/* ---------- filtros ---------- */
+const fU=$('fU'),fY=$('fY'),fM=$('fM'),fD=$('fD');
+const maxDay=m=>isPartial(m)?corte.getDate():dim(m);
+function fillYM(){
+  const ys=[...new Set(monthsAll.map(m=>m.slice(0,4)))].reverse();
+  fY.innerHTML=ys.map(y=>`<option ${y===state.m.slice(0,4)?'selected':''}>${y}</option>`).join('');
+  const ms=monthsAll.filter(m=>m.startsWith(state.m.slice(0,4)));
+  fM.innerHTML=ms.map(m=>`<option value="${m}" ${m===state.m?'selected':''}>${cap(MESES[+m.slice(5)-1])}</option>`).join('');
+  const md=maxDay(state.m);if(!state.day||state.day>md)state.day=md;
+  fD.innerHTML=Array.from({length:md},(_,k)=>k+1).reverse().map(d=>`<option value="${d}" ${d===state.day?'selected':''}>Día ${d}${d===md?(isPartial(state.m)?' · último con venta':' · mes completo'):''}</option>`).join('');
+}
+function buildFilters(){
+  fU.innerHTML=[CONS,...U].map(u=>`<option value="${u}">${u===CONS?'Grupo AB (consolidado)':D.short[u]+(hasSales(u)?'':' · solo nómina')}</option>`).join('');
+  fU.onchange=()=>{state.u=fU.value;state.meta=0;refresh()};
+  fY.onchange=()=>{const y=fY.value,mm=state.m.slice(5);const ms=monthsAll.filter(m=>m.startsWith(y));
+    state.m=ms.includes(y+'-'+mm)?y+'-'+mm:ms[ms.length-1];state.day=maxDay(state.m);refresh()};
+  fM.onchange=()=>{state.m=fM.value;state.day=maxDay(state.m);refresh()};
+  fD.onchange=()=>{state.day=+fD.value;refresh()};
+}
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{state.tab=t.dataset.tab;refresh()});
+document.getElementById('stamp').innerHTML=`Ventas al <b>${corte.getDate()} ${MES3[corte.getMonth()]} ${corte.getFullYear()}</b><br>Nómina CFDI al <b>${corteNTxt}</b>`;
+
+function refresh(){
+  fU.value=state.u;fillYM();
+  document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected',t.dataset.tab===state.tab));
+  const cd=cutDay(state.m);
+  $('mesnote').textContent=cd?`Las cifras de venta se calculan del 1 al ${cd} de ${MESES[+state.m.slice(5)-1]} y se comparan contra el mismo día de otros meses.`:'Mes completo.';
+  ({resumen:renderResumen,ventas:renderVentas,gastos:renderGastos,nomina:renderNomina})[state.tab]();
+}
+
+/* ================= RESUMEN ================= */
+function renderResumen(){
+  const u=state.u,m=state.m,cd=cutDay(m);
+  const nm=nomMonthFor(m),pr=nm?prodOf(u,nm):null;
+  if(!hasSales(u)){renderNoSales(u,m,nm,pr);return}
+  const cur=agg(u,m,cd),prev=agg(u,shift(m,-1),cd),ly=agg(u,shift(m,-12),cd);
+  const dPrev=delta(cur.venta,prev.venta),dLy=delta(cur.venta,ly.venta);
+  const proj=cd?cur.venta/cd*dim(m):null;
+  const newU=SALES_U.filter(i=>(uIdx(u)==null||uIdx(u)===i)&&agg(U[i],m,cd).venta>0&&!agg(U[i],shift(m,-12),cd).venta).map(i=>D.short[U[i]]);
+  const cmpTxt=[dPrev!=null&&prev.venta?dword(dPrev,`frente a ${MESES[+shift(m,-1).slice(5)-1]}${cd?' al día '+cd:''}`):null,
+                ly.venta?dword(dLy,`frente a ${mLabel(shift(m,-12))}${cd?' al día '+cd:''}`)+(u===CONS&&newU.length?` (incluye ${newU.join(', ')}, que no operaba ese mes)`:''):null].filter(Boolean);
+  const st=pr&&pr.pct!=null&&pr.pct<5?status(pr.pct):null;
+  view.innerHTML=`
+  <div class="lede"><div>
+    <p class="kicker">Venta de ${uName(u)} · ${mLabel(m)}${cd?` · del 1 al ${cd}`:''}</p>
+    <p class="big">${money(cur.venta)}</p>
+    <p class="lede-text">${cmpTxt.length?cmpTxt.join(' y ')+'.':'Sin periodo comparable disponible.'} ${proj?(isPartial(m)&&cd===corte.getDate()?`Al ritmo actual, el mes cerraría cerca de <b>${money(proj)}</b>.`:`Al ritmo de esos ${cd} días, el mes proyectaba <b>${money(proj)}</b>${isPartial(m)?'':`; cerró en <b>${money(agg(u,m).venta)}</b>`}.`):''}</p>
+  </div></div>
+  <div class="kpis">
+    <div class="kpi"><div class="l">Comensales</div><div class="v">${num(cur.p)}</div><div class="s">${cur.dias} días con venta</div></div>
+    <div class="kpi"><div class="l">Ticket promedio por persona</div><div class="v">${money(cur.ticket)}</div><div class="s">${prev.ticket?dword(delta(cur.ticket,prev.ticket),'vs mes anterior'):'&nbsp;'}</div></div>
+    <div class="kpi"><div class="l">Venta promedio por día</div><div class="v">${money(cur.diaria)}</div><div class="s">${prev.diaria?dword(delta(cur.diaria,prev.diaria),'vs mes anterior'):'&nbsp;'}</div></div>
+    <div class="kpi"><div class="l">Nómina sobre venta${nm&&nm!==m?` (${mShort(nm)})`:''}</div><div class="v ${st&&st[0]==='cr'?'o':''}">${st?pct(pr.pct):'—'}</div><div class="s">${st?st[1]:'Sin nómina para este mes'}</div></div>
+  </div>
+  <section class="block"><div class="bh"><h2>${u===CONS?'Así contribuye cada restaurante a la venta del grupo':'Así se compara '+uName(u)+' con el resto del grupo'}</h2>
+    <p>Venta de ${mLabel(m)}${cd?` del 1 al ${cd}`:''} y variación contra el mes anterior al mismo corte. Toca un restaurante para ver su detalle.</p></div>
+    <div class="panel" id="rank"></div></section>
+  <section class="block"><div class="bh"><h2 id="trendTitle"></h2><p>Venta mensual ${m.slice(0,4)} frente a ${+m.slice(0,4)-1}. ${m.slice(0,4)===D.corteVentas.slice(0,4)?'El mes en curso se muestra proyectado al cierre con línea punteada.':''}</p></div>
+    <div class="panel"><div class="legend"><span><i style="background:#0077FF"></i>2026</span><span><i style="background:#B9BED3"></i>2025</span>${m.slice(0,4)===D.corteVentas.slice(0,4)?'<span><i style="background:#F1571E"></i>Proyección mes en curso</span>':''}</div><div id="trend"></div><p class="src">Fuente: base de venta diaria por restaurante. Montos en pesos mexicanos.</p></div></section>`;
+  // ranking
+  const list=SALES_U.map(i=>{const un=U[i],a=agg(un,m,cd),b=agg(un,shift(m,-1),cd);return{un,v:a.venta,d:b.venta?delta(a.venta,b.venta):null}}).filter(r=>r.v>0).sort((a,b)=>b.v-a.v);
+  const tot=list.reduce((a,r)=>a+r.v,0),mx=Math.max(...list.map(r=>r.v));
+  $('rank').innerHTML=list.map(r=>`<div class="hrow ${r.un===u?'on':''}" data-u="${r.un}" tabindex="0"><div class="n">${D.short[r.un]}<small>${pct(r.v/tot)} del grupo</small></div>
+    <div class="track"><div class="fill" style="width:${r.v/mx*100}%"></div></div>
+    <div class="val">${moneyC(r.v)}<small class="${r.d==null?'dash':r.d>=0?'up':'down'}">${r.d==null?'nueva':(r.d>=0?'+':'−')+pct(Math.abs(r.d))}</small></div></div>`).join('')||'<p>Sin venta registrada.</p>';
+  $('rank').querySelectorAll('.hrow').forEach(h=>{h.onclick=()=>{state.u=h.dataset.u;refresh()};h.onkeydown=e=>{if(e.key==='Enter')h.click()}});
+  // tendencia anual
+  const y=m.slice(0,4),y0=String(+y-1);const labs=MES3.map(x=>cap(x));
+  const s1=MES3.map((_,k)=>{const mm=y+'-'+String(k+1).padStart(2,'0');if(mm>D.corteVentas.slice(0,7))return null;const a=agg(u,mm);return a.venta||null});
+  const s0=MES3.map((_,k)=>{const a=agg(u,y0+'-'+String(k+1).padStart(2,'0'));return a.venta||null});
+  const hl=+m.slice(5)-1;let projS=null;
+  const pm=D.corteVentas.slice(0,7);
+  if(pm.startsWith(y)){const k=+pm.slice(5)-1,a=agg(u,pm);projS=MES3.map((_,i)=>i===k?a.venta/corte.getDate()*dim(pm):i===k-1?s1[k-1]:null);s1[k]=null}
+  const ytd=s1.reduce((a,v,i)=>a+(v||0),0)+(pm.startsWith(y)?agg(u,pm).venta:0);
+  $('trendTitle').textContent=`En ${y}, ${uName(u)} acumula ${moneyC(ytd)} en venta`;
+  const series=[{name:y0,values:s0,color:'#B9BED3',w:2},{name:y,values:s1,color:'#0077FF',hl:s1[hl]!=null&&m.startsWith(y)?hl:undefined}];
+  if(projS)series.push({name:'Proyección',values:projS,color:'#F1571E',dash:true,hl:m===pm?+pm.slice(5)-1:undefined});
+  lineChart($('trend'),{labels:labs,series,fy:v=>moneyC(v).replace(' mil','k'),ft:moneyC,aria:'Venta mensual'});
+}
+function renderNoSales(u,m,nm,pr){
+  view.innerHTML=`<div class="lede"><div><p class="kicker">Costo de nómina de ${uName(u)}${nm?' · '+mLabel(nm):''}</p>
+    <p class="big navy">${pr?money(pr.costo):'—'}</p>
+    <p class="lede-text">${uName(u)} todavía no registra venta en la base, por eso aquí solo se muestra su nómina. Consulta el detalle por puesto y nivel en <b>Nómina y equipo</b>.</p></div></div>
+    <div class="kpis"><div class="kpi"><div class="l">Personal pagado en el mes</div><div class="v">${pr?num(pr.hc):'—'}</div></div>
+    <div class="kpi"><div class="l">Empleados activos al ${corteNTxt}</div><div class="v">${D.comp[u].act}</div></div>
+    <div class="kpi"><div class="l">Rotación anualizada</div><div class="v">${pct(D.comp[u].rot,0)}</div></div>
+    <div class="kpi"><div class="l">Nómina base mensual</div><div class="v">${moneyC(D.comp[u].base)}</div></div></div>`;
+}
+
+/* ================= VENTAS ================= */
+function cumSeries(u,mm,upto){const dm=daily(u,mm),n=Math.min(dim(mm),maxDay(mm)),out=[];let c=0,any=false;
+  for(let d=1;d<=31;d++){if(d>n){out.push(null);continue}c+=dm[d]||0;if(dm[d])any=true;out.push(c)}return any?out:null}
+function cumChart(el,o){
+  const W=Math.max(el.clientWidth,280),H=o.h||300,m={t:22,r:20,b:30,l:62};const iw=W-m.l-m.r,ih=H-m.t-m.b;
+  const all=o.series.flatMap(s=>s.values).filter(v=>v!=null);const mx=niceMax(Math.max(...all)*1.05);
+  const x=d=>m.l+(d-1)*iw/30,y=v=>m.t+ih-(v/mx)*ih;let s=`<svg width="${W}" height="${H}" role="img" aria-label="Venta acumulada por día">`;
+  for(let k=0;k<=4;k++){const v=mx*k/4,yy=y(v);s+=`<line x1="${m.l}" x2="${W-m.r}" y1="${yy}" y2="${yy}" stroke="#EEF0F6"/><text x="${m.l-8}" y="${yy+4}" text-anchor="end" font-size="11" fill="#8A90AE">${moneyC(v).replace(' mil','k')}</text>`}
+  [1,5,10,15,20,25,31].forEach(d=>s+=`<text x="${x(d)}" y="${H-10}" text-anchor="middle" font-size="11" fill="#5B6285">${d}</text>`);
+  const xd=x(o.day);s+=`<line x1="${xd}" x2="${xd}" y1="${m.t}" y2="${m.t+ih}" stroke="#00008A" stroke-width="1.2" stroke-dasharray="4 4"/><text x="${xd+6}" y="${m.t+10}" font-size="11.5" font-weight="700" fill="#00008A">Día ${o.day}</text>`;
+  [...o.series].sort((a,b)=>(a.sel?1:0)-(b.sel?1:0)).forEach(se=>{let d='';se.values.forEach((v,i)=>{if(v==null)return;d+=(d?'L':'M')+x(i+1)+' '+y(v)});
+    s+=`<path d="${d}" fill="none" stroke="${se.color}" stroke-width="${se.sel?3.5:1.8}" stroke-linejoin="round" stroke-linecap="round"/>`;
+    const vi=se.values[Math.min(o.day,se.values.filter(v=>v!=null).length)-1];
+    if(vi!=null){const dd=Math.min(o.day,se.values.filter(v=>v!=null).length);s+=`<circle cx="${x(dd)}" cy="${y(vi)}" r="${se.sel?6:3.5}" fill="${se.color}" stroke="#fff" stroke-width="2"/><circle cx="${x(dd)}" cy="${y(vi)}" r="11" fill="transparent" data-tip="<b>${se.name}</b> al día ${dd}: ${money(vi)}"/>`}});
+  el.innerHTML=s+'</svg>'}
+function renderVentas(){
+  const u=state.u,m=state.m,day=state.day,cd=cutDay(m);
+  if(!hasSales(u)){view.innerHTML=`<div class="empty"><b>${uName(u)} aún no registra venta</b>Cuando se agregue su venta diaria a la base, este tablero se llenará solo. Mientras tanto, revisa su nómina en la pestaña Nómina y equipo.</div>`;return}
+  // acumulado: mes seleccionado y 6 meses previos
+  const ms=[6,5,4,3,2,1,0].map(k=>shift(m,-k));
+  const blues=['#D3D8E8','#C2CAE2','#AFBBE0','#94A9E0','#6F92E6','#3C7FF0'];
+  const cmp=ms.map(mm=>{const a=agg(u,mm,Math.min(day,dim(mm)));const tot=agg(u,mm);return{mm,cum:a.venta,p:a.p,tot:tot.venta,full:!isPartial(mm),sel:mm===m}}).filter(r=>r.tot>0);
+  const prevs=cmp.filter(r=>!r.sel&&r.cum>0),avg6=prevs.length?prevs.reduce((a,r)=>a+r.cum,0)/prevs.length:null;
+  const selR=cmp.find(r=>r.sel)||{cum:0};const dAvg=delta(selR.cum,avg6);
+  const rankPos=[...cmp].sort((a,b)=>b.cum-a.cum).findIndex(r=>r.sel)+1;
+  const best=[...prevs].sort((a,b)=>b.cum-a.cum)[0];
+  const series=[];let bi=6-prevs.length;
+  cmp.forEach(r=>{const v=cumSeries(u,r.mm);if(v)series.push({name:cap(mLabel(r.mm)),values:v,color:r.sel?'#F1571E':blues[Math.max(bi++,0)],sel:r.sel})});
+  // venta diaria
+  const dm=daily(u,m),nd=dim(m),vals=[],labs=[],cols=[],tips=[],cur=agg(u,m,cd);
+  let bestD=null;for(let d=1;d<=nd;d++){const v=dm[d]??null;if(v!=null&&(bestD==null||v>dm[bestD]))bestD=d}
+  for(let d=1;d<=nd;d++){const v=dm[d]??null,dt=new Date(+m.slice(0,4),+m.slice(5)-1,d),wd=dt.getDay();vals.push(v);labs.push(d);
+    cols.push(d>day?'#D3D8E8':d===bestD?'#F1571E':(wd===5||wd===6||wd===0)?'#00008A':'#0077FF');tips.push(`<b>${DIAS[wd]} ${d} ${MES3[dt.getMonth()]}</b> · ${v==null?'sin venta':money(v)}`)}
+  // día de la semana
+  const end=new Date(+m.slice(0,4),+m.slice(5)-1,day);const start=new Date(end);start.setDate(start.getDate()-83);
+  const i=uIdx(u),byDate={};V.forEach(r=>{if(i!=null&&r.u!==i)return;const t=new Date(r.d+'T12:00:00');if(t>=start&&t<=end){byDate[r.d]=byDate[r.d]||{v:0,p:0,w:t.getDay()};byDate[r.d].v+=r.v;byDate[r.d].p+=r.p}});
+  const wk=[1,2,3,4,5,6,0].map(w=>{const ds=Object.values(byDate).filter(x=>x.w===w);const sv=ds.reduce((a,x)=>a+x.v,0),sp=ds.reduce((a,x)=>a+x.p,0);return{w,v:ds.length?sv/ds.length:null,p:ds.length?sp/ds.length:null,t:sp?sv/sp:null}});
+  const wv=wk.filter(x=>x.v!=null),top=wv.reduce((a,x)=>x.v>a.v?x:a,wv[0]),low=wv.reduce((a,x)=>x.v<a.v?x:a,wv[0]);const ratio=top&&low?top.v/low.v:null;
+  const mn=MESES[+m.slice(5)-1];
+  view.innerHTML=`
+  <div class="lede"><p class="kicker">Venta acumulada de ${uName(u)} · del 1 al ${day} de ${mn} ${m.slice(0,4)}</p>
+    <p class="big">${money(selR.cum)}</p>
+    <p class="lede-text">${avg6?`${dword(dAvg,`frente al promedio de los ${prevs.length} meses anteriores al mismo día (${money(avg6)})`)}. `:''}${cmp.length>1?`Es el <b>${rankPos}.º de ${cmp.length}</b> meses comparados${best?`; el mejor fue ${mLabel(best.mm)} con ${money(best.cum)}`:''}.`:''}</p></div>
+  <section class="block" style="margin-top:28px"><div class="bh"><h2>Cómo se construye la venta del mes, día a día</h2><p>Venta acumulada de ${mn} (naranja) contra los 6 meses anteriores (azules, más intenso = más reciente). La línea punteada marca el día ${day}.</p></div>
+    <div class="panel"><div class="legend">${series.map(s=>`<span><i style="background:${s.color};height:${s.sel?4:3}px"></i>${s.name}</span>`).join('')}</div><div id="cchart"></div></div></section>
+  <div class="two">
+  <section class="block"><div class="bh"><h2>Acumulado al día ${day}, mes por mes</h2><p>Misma fecha de corte en cada mes. La línea punteada es el promedio de los meses anteriores${avg6?` (${moneyC(avg6)})`:''}.</p></div>
+    <div class="panel"><div id="abars"></div></div></section>
+  <section class="block"><div class="bh"><h2>Acumulado contra el total de cada mes</h2><p>Qué parte del mes ya se había vendido al día ${day}.</p></div>
+    <div class="panel"><table><thead><tr><th>Mes</th><th class="r">Al día ${day}</th><th class="r">Total del mes</th><th class="r hide-m">Avance</th></tr></thead><tbody>
+    ${cmp.map(r=>`<tr class="${r.sel?'hl-row':''}"><td><b style="font-weight:${r.sel?700:600}">${cap(mLabel(r.mm))}</b></td><td class="r">${moneyC(r.cum)}</td><td class="r">${r.full?moneyC(r.tot):'<span class="subk">en curso</span>'}</td><td class="r hide-m">${r.full&&r.tot?pct(r.cum/r.tot,0):'—'}</td></tr>`).join('')}
+    <tr class="tot"><td>Total ${cmp.length} meses</td><td class="r">${moneyC(cmp.reduce((a,r)=>a+r.cum,0))}</td><td class="r">${moneyC(cmp.reduce((a,r)=>a+r.tot,0))}</td><td class="r hide-m"></td></tr>
+    </tbody></table>${day>28?`<p class="src">En meses con menos de ${day} días se toma el mes completo.</p>`:''}</div></section></div>
+  <section class="block"><div class="bh"><h2>Venta por día de ${mn}</h2><p>Marino: viernes a domingo. Naranja: el mejor día hasta el día ${day}. Gris: días posteriores al corte elegido. Línea punteada: promedio diario al corte.</p></div>
+    <div class="panel"><div id="dchart"></div></div></section>
+  <div class="two">
+  <section class="block"><div class="bh"><h2>${top&&ratio?`Los ${nameDay(top.w)} venden ${ratio.toLocaleString('es-MX',{maximumFractionDigits:1})} veces lo de los ${nameDay(low.w)}`:'Venta por día de la semana'}</h2>
+    <p>Promedio por día de la semana en las 12 semanas previas al ${day} de ${mn}.</p></div>
+    <div class="panel"><div id="wchart"></div></div></section>
+  <section class="block"><div class="bh"><h2>Comensales y ticket por día de la semana</h2><p>Mismo periodo de 12 semanas. Ayuda a planear turnos y promociones.</p></div>
+    <div class="panel"><table><thead><tr><th>Día</th><th class="r">Comensales</th><th class="r">Ticket</th><th class="r hide-m">Venta</th></tr></thead><tbody>
+    ${wk.map(x=>`<tr><td><b style="font-weight:600">${nameDay(x.w,true)}</b></td><td class="r">${num(x.p)}</td><td class="r">${money(x.t)}</td><td class="r hide-m">${moneyC(x.v)}</td></tr>`).join('')}
+    </tbody></table></div></section></div>`;
+  cumChart($('cchart'),{series,day});
+  barChart($('abars'),{values:cmp.map(r=>r.cum),labels:cmp.map(r=>cap(MES3[+r.mm.slice(5)-1])),colors:cmp.map(r=>r.sel?'#F1571E':'#0077FF'),tips:cmp.map(r=>`<b>${cap(mLabel(r.mm))}</b> al día ${day}: ${money(r.cum)}`),avg:avg6,noAvgText:true,vlabels:true,h:260});
+  barChart($('dchart'),{values:vals,labels:labs,colors:cols,tips,avg:cur.diaria,aria:'Venta diaria'});
+  barChart($('wchart'),{values:wk.map(x=>x.v),labels:wk.map(x=>DIAS[x.w]),colors:wk.map(x=>x===top?'#F1571E':'#0077FF'),tips:wk.map(x=>`<b>${nameDay(x.w,true)}</b> · ${money(x.v)} promedio`),h:230});
+}
+function nameDay(w,capit){return capit?['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'][w]:['domingos','lunes','martes','miércoles','jueves','viernes','sábados'][w]}
+
+/* ================= GASTOS ================= */
+const PREM_U=D.conPremisas;
+function initScen(){state.scen=D.prem.map(p=>{const o={};PREM_U.forEach(i=>o[i]=+(p.v[i]||0));return o})}
+function gBase(u){const m=state.m,cd=cutDay(m),us=u===CONS?PREM_U:[uIdx(u)];
+  return us.map(i=>{const A=agg(U[i],m,cd).venta;const P=cd?A/cd*dim(m):A;return{i,A,C:state.gb==='acum'?A:(u!==CONS&&state.gb==='meta'&&state.meta>0)?state.meta:P}})}
+function gCalc(u){const b=gBase(u);const A=b.reduce((a,x)=>a+x.A,0),C=b.reduce((a,x)=>a+x.C,0);
+  const rows=D.prem.map((p,r)=>{const gA=b.reduce((a,x)=>a+x.A*state.scen[r][x.i],0),gC=b.reduce((a,x)=>a+x.C*state.scen[r][x.i],0);
+    return{r,gA,gC,p:u===CONS?(A?gA/A:0):state.scen[r][b[0].i]}});
+  const gA=rows.reduce((a,x)=>a+x.gA,0),gC=rows.reduce((a,x)=>a+x.gC,0);return{A,C,rows,gA,gC,p:A?gA/A:rows.reduce((a,x)=>a+x.p,0)}}
+function gStatus(p){const b=D.bench;if(!p)return null;if(p<b.gmin)return['lo','Debajo de 5% a 10%'];if(p<=b.gmax)return['ok','En rango 5% a 10%'];if(p<=b.gcrit)return['hi','Arriba de 5% a 10%'];return['cr','Crítico: más de 15%']}
+function renderGastos(){
+  if(!state.scen)initScen();
+  const u=state.u,m=state.m,day=state.day,cd=cutDay(m),mn=MESES[+m.slice(5)-1];
+  if(u!==CONS&&!PREM_U.includes(uIdx(u))){view.innerHTML=`<div class="empty"><b>${uName(u)} no tiene premisas de gasto</b>Por ahora solo se analiza su nómina. Cuando se capture su venta y sus premisas en el archivo, aparecerán aquí.</div>`;return}
+  const edit=u!==CONS,iu=uIdx(u);
+  const useMeta=()=>edit&&state.gb==='meta'&&state.meta>0;
+  const closeLbl=()=>state.gb==='acum'?`Venta acumulada al día ${day}`:useMeta()?'Venta capturada para el escenario':cd?(isPartial(m)&&cd===corte.getDate()?'Venta proyectada al cierre':`Proyección con ritmo al día ${cd}`):'Venta real del mes';
+  view.innerHTML=`
+  <div class="lede"><p class="kicker">Gasto disponible según premisas · ${uName(u)} · del 1 al ${day} de ${mn}</p>
+    <p class="big" id="gBig"></p><p class="lede-text" id="gTxt"></p></div>
+  <div class="kpis">
+    <div class="kpi"><div class="l">Venta al día ${day}</div><div class="v" id="kA"></div><div class="s">${cd?`${cd} de ${dim(m)} días`:'Mes completo'}</div></div>
+    <div class="kpi"><div class="l" id="kCl"></div><div class="v" id="kC"></div><div class="s" id="kCs"></div></div>
+    <div class="kpi"><div class="l">Premisas sobre la venta</div><div class="v" id="kP"></div><div class="s" id="kPs"></div></div>
+    <div class="kpi"><div class="l" id="kGl"></div><div class="v o" id="kG"></div><div class="s" id="kGs"></div></div>
+  </div>
+  <section class="block"><div class="bh"><h2>Cuánto se puede gastar en cada rubro</h2>
+    <p>${edit?'Cambia el porcentaje de cualquier rubro para simular un escenario. Los cambios solo viven en tu pantalla: al recargar vuelven las premisas del archivo.':'Vista del grupo: suma lo que permite cada restaurante con sus propias premisas. Para simular, elige un restaurante.'}</p></div>
+    <div class="panel">
+      <div class="toolbar"><div class="basesel"><span class="subk">Calcular el gasto con</span>
+        <div class="seg" role="group" aria-label="Venta base"><button data-gb="acum">Venta acumulada al día ${day}</button><button data-gb="proj">${cd?'Proyección al cierre':'Venta del mes'}</button>${edit?'<button data-gb="meta">Otro monto</button>':''}</div>
+        ${edit?`<input id="gMeta" class="money-in" style="width:160px;padding:8px 10px;font-size:14px;${state.gb==='meta'?'':'display:none'}" type="number" min="0" step="10000" placeholder="Venta del mes" aria-label="Venta del mes para el escenario" value="${state.meta||''}">`:''}</div></div>
+      <div class="toolbar" style="margin-top:-4px"><span class="status" id="gStat"></span><button class="btn" id="gReset">Restablecer premisas del archivo</button></div>
+      <div class="tscroll"><table class="gt"><thead><tr><th>Rubro</th><th class="r">Premisa</th><th class="r hide-m cA">Disponible al día ${day}</th><th class="r" id="thC"></th></tr></thead><tbody>
+      ${D.prem.map((p,r)=>`<tr><td><b style="font-weight:600">${p.d}</b><div class="lvl">${p.g}</div></td>
+        <td class="r">${edit?`<span class="pwrap"><input class="pin" type="number" min="0" max="100" step="0.1" data-r="${r}" aria-label="Premisa ${p.d} en porcentaje" value="${+(state.scen[r][iu]*100).toFixed(2)}">%</span>`:`<span id="gp${r}"></span>`}</td>
+        <td class="r hide-m cA" id="ga${r}"></td><td class="r" id="gc${r}"></td></tr>`).join('')}
+      <tr class="tot"><td>Total premisas</td><td class="r" id="gpT"></td><td class="r hide-m cA" id="gaT"></td><td class="r" id="gcT"></td></tr></tbody></table></div>
+      <p class="src">Premisas: hoja Premisas del archivo, % sobre la venta mensual de cada restaurante. Referencia de otros gastos operativos en México: 5% a 10% de la venta.</p></div></section>
+  <section class="block"><div class="bh"><h2>¿Cuánto hay que vender para gastar lo que necesitas?</h2><p>Elige un rubro y escribe el monto que quieres gastar este mes. El cálculo usa la premisa vigente en la tabla de arriba.</p></div>
+    <div class="panel">${edit?`<div class="calc"><div class="fgrid" style="grid-template-columns:1fr">
+        <div><label class="fl" for="cR">Rubro</label><div class="sel"><select id="cR"><option value="-1">Todos los rubros (total de premisas)</option>${D.prem.map((p,r)=>`<option value="${r}" ${state.calc.r===r?'selected':''}>${p.d}</option>`).join('')}</select></div></div>
+        <div><label class="fl" for="cA">Monto que quieres gastar en el mes</label><input id="cA" class="money-in" type="number" min="0" step="1000" placeholder="$0" value="${state.calc.amt||''}"></div></div>
+      <div id="cOut" aria-live="polite"></div></div>`:`<p class="subk" style="margin:0">Elige un restaurante en el filtro para usar la calculadora: cada uno tiene sus propias premisas.</p>`}</div></section>`;
+  const upd=()=>{
+    const g=gCalc(u),st=gStatus(g.p);
+    $('gBig').textContent=money(g.gA);
+    $('gTxt').innerHTML=g.p?`Con <b>${money(g.A)}</b> vendidos del 1 al ${day}, las premisas (${pct(g.p)} de la venta) permiten gastar hasta <b>${money(g.gA)}</b>. ${state.gb==='acum'?'':`Con ${closeLbl().toLowerCase()} de ${money(g.C)}, el techo del mes sería <b>${money(g.gC)}</b>.`}`
+      :`Las premisas ${edit&&isMod()?'del escenario':'del archivo'} están en 0%, por eso no hay gasto disponible. ${edit?'Escribe porcentajes en la tabla para simular un escenario.':'Elige un restaurante para simular un escenario.'}`;
+    const Pj=cd?g.A/cd*dim(m):g.A;$('kA').textContent=moneyC(g.A);$('kCl').textContent=state.gb==='acum'?(cd?'Proyección al cierre (referencia)':'Venta del mes'):closeLbl();$('kC').textContent=moneyC(state.gb==='acum'?Pj:g.C);$('kCs').textContent=state.gb==='acum'?(cd?`Techo al cierre: ${moneyC(Pj*g.p)}`:'Venta registrada'):useMeta()?'Captura manual':cd?`Promedio diario × ${dim(m)} días`:'Venta registrada';
+    $('kP').textContent=pct(g.p);$('kPs').innerHTML=st?`<span class="chip ${st[0]}">${st[1]}</span>`:'Sin premisas capturadas';$('kG').textContent=moneyC(g.gC);
+    $('thC').textContent=state.gb==='acum'?`Disponible con venta al día ${day}`:useMeta()?'Disponible con monto capturado':cd?'Disponible al cierre':'Disponible con venta del mes';
+    view.querySelectorAll('.cA').forEach(e=>e.style.display=state.gb==='acum'?'none':'');
+    view.querySelectorAll('.seg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.gb===state.gb));$('kGl').textContent=state.gb==='acum'?'Gasto disponible hoy':'Techo de gasto del mes';$('kGs').textContent='Con '+closeLbl().toLowerCase();
+    g.rows.forEach(x=>{$('ga'+x.r).textContent=money(x.gA);$('gc'+x.r).textContent=money(x.gC);if(!edit)$('gp'+x.r).textContent=pct(x.p,2)});
+    $('gpT').textContent=pct(g.p,2);$('gaT').textContent=money(g.gA);$('gcT').textContent=money(g.gC);
+    const n=modCount();$('gStat').textContent=edit?(n?`Escenario modificado: ${n} ${n===1?'rubro':'rubros'} distinto${n===1?'':'s'} al archivo`:'Premisas del archivo'):'Premisas del archivo por restaurante';$('gStat').className='status'+(n?' mod':'');
+    $('gReset').disabled=!n;
+    view.querySelectorAll('.pin').forEach(el=>el.classList.toggle('chg',Math.abs(state.scen[+el.dataset.r][iu]-(D.prem[+el.dataset.r].v[iu]||0))>1e-9));
+    if(edit)calcOut(g);
+  };
+  function isMod(){return modCount()>0}
+  function modCount(){if(!edit)return PREM_U.reduce((a,i)=>a+D.prem.filter((p,r)=>Math.abs(state.scen[r][i]-(p.v[i]||0))>1e-9).length,0);return D.prem.filter((p,r)=>Math.abs(state.scen[r][iu]-(p.v[iu]||0))>1e-9).length}
+  function calcOut(g){
+    const r=state.calc.r,amt=state.calc.amt,p=r<0?g.p:state.scen[r][iu],name=r<0?'el total de rubros':D.prem[r].d.toLowerCase(),o=$('cOut');
+    if(!amt){o.innerHTML=`<p class="subk">Escribe un monto para ver la venta mensual que lo sostiene.</p>`;return}
+    if(!p){o.innerHTML=`<p class="res-line">${r<0?'Las premisas suman':'Este rubro tiene'} <b>0%</b> de premisa, así que ninguna venta lo cubre. Asígnale un porcentaje en la tabla de arriba para calcular.</p>`;return}
+    const need=amt/p,cap_=g.C*p,hol=cap_-amt,falta=need-g.A,rem=dim(m)-day,live=isPartial(m)&&day===corte.getDate(),dNow=g.A/day,dReq=rem>0?falta/rem:null;
+    o.innerHTML=`<p class="subk" style="margin:0 0 4px">Venta mensual necesaria para gastar ${money(amt)} en ${name} (${pct(p,2)} de la venta)</p>
+      <p class="res-big">${money(need)}</p>
+      <p class="res-line">Llevas <b>${money(g.A)}</b> al día ${day}, el <b>${pct(g.A/need,0)}</b> de esa venta.</p>
+      <p class="res-line">${hol>=0?`Con ${closeLbl().toLowerCase()} (${money(g.C)}) el techo para ${name} es ${money(cap_)}: <b class="up">te sobran ${money(hol)}</b>.`:`Con ${closeLbl().toLowerCase()} (${money(g.C)}) el techo para ${name} es ${money(cap_)}: <b class="down">el gasto lo excede por ${money(-hol)}</b>.`}</p>
+      ${falta<=0?`<p class="res-line"><b class="up">La venta acumulada ya cubre este gasto.</b></p>`:live&&rem>0?`<p class="res-line">Para lograrlo faltan <b>${money(falta)}</b>: <b>${money(dReq)} por día</b> en los ${rem} días restantes, contra ${money(dNow)} que se venden hoy en promedio (${dword(delta(dReq,dNow),'').trim()} por día).</p>`:''}`;
+  }
+  view.querySelectorAll('.pin').forEach(el=>el.oninput=()=>{let v=parseFloat(el.value);if(isNaN(v)||v<0)v=0;if(v>100)v=100;state.scen[+el.dataset.r][iu]=v/100;upd()});
+  $('gReset').onclick=()=>{initScen();renderGastos()};
+  view.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{state.gb=b.dataset.gb;if($('gMeta')){$('gMeta').style.display=state.gb==='meta'?'':'none';if(state.gb==='meta')$('gMeta').focus()}upd()});
+  if($('gMeta'))$('gMeta').oninput=e=>{state.meta=Math.max(parseFloat(e.target.value)||0,0);upd()};
+  if($('cR')){$('cR').value=state.calc.r;$('cR').onchange=e=>{state.calc.r=+e.target.value;upd()};$('cA').oninput=e=>{state.calc.amt=Math.max(parseFloat(e.target.value)||0,0);upd()}}
+  upd();
+}
+
+/* ================= NÓMINA ================= */
+let showAll=false;
+function renderNomina(){
+  const u=state.u,m=state.m,c=D.comp[u],bj=D.bajas[u]||{};let nm=nomMonthFor(m);const pr=nm?prodOf(u,nm):null;
+  if(nm&&!pr)nm=null;
+  const sales=hasSales(u)&&pr&&pr.pct!=null&&pr.pct<5;const st=sales?status(pr.pct):null;
+  const lo=.15,hi=.40,pos=v=>Math.min(Math.max((v-lo)/(hi-lo),0),1)*100;
+  const labelM=nm?mLabel(nm):null;
+  let lede;
+  if(!nm){lede=`<div class="empty"><b>No hay nómina para ${mLabel(m)}</b>${uName(u)} no tiene CFDI de nómina en ese mes. La base de nómina inicia en ${nomMonths.length?mLabel(nomMonths[0]):'—'}.</div>`}
+  else if(sales){lede=`<div class="lede split"><div><p class="kicker">Nómina sobre venta · ${uName(u)} · ${labelM}</p>
+      <p class="big ${st[0]==='cr'||st[0]==='hi'?'':'navy'}">${pct(pr.pct)}</p>
+      <p class="lede-text">De cada $100 que vendió ${uName(u)}, <b>$${(pr.pct*100).toFixed(0)}</b> se destinaron a nómina (sueldos, cargas IMSS e INFONAVIT, ISN y provisión de aguinaldo). <span class="chip ${st[0]}">${st[1]}</span></p></div>
+      <div><div class="gauge"><div class="gscale"><div class="gband" style="left:${pos(D.bench.min)}%;width:${pos(D.bench.max)-pos(D.bench.min)}%"></div><div class="gcrit" style="left:${pos(D.bench.crit)}%"></div><div class="gpin" style="left:${pos(pr.pct)}%"></div></div>
+      <div class="gticks">${[.15,.2,.25,.3,.35,.4].map(t=>`<span style="left:${pos(t)}%">${t*100}%</span>`).join('')}</div>
+      <p class="fnote" style="margin-top:4px">Franja marino: rango de referencia para restaurantes de servicio completo en México (25% a 30%). Franja naranja: nivel crítico, arriba de 35%.</p></div></div></div>`}
+  else{lede=`<div class="lede"><div><p class="kicker">Costo total de nómina · ${uName(u)} · ${labelM}</p><p class="big navy">${money(pr.costo)}</p>
+      <p class="lede-text">${uName(u)} no registra venta en la base; por eso no se calcula la proporción de nómina sobre venta.</p></div></div>`}
+  const note=[nm&&nm!==m?`La nómina más reciente disponible es de ${labelM}; ${mLabel(m)} todavía no tiene CFDI de nómina.`:null,pr&&pr.nota?pr.nota.replace(/\.*$/,'.'):null].filter(Boolean);
+  const sal=D.sal[u]||[],totN=sal.reduce((a,r)=>a+r.n,0),totC=sal.reduce((a,r)=>a+r.cost,0),salShown=showAll?sal:sal.slice(0,16);
+  const lv=[...new Set(sal.map(r=>r.nv))].map(nv=>{const rs=sal.filter(r=>r.nv===nv);return{nv,nl:rs[0].nl,n:rs.reduce((a,r)=>a+r.n,0),cost:rs.reduce((a,r)=>a+r.cost,0)}});const mxc=Math.max(...lv.map(x=>x.cost),1);
+  const salTitle=`${totN} personas en ${sal.length} puestos: ${money(totC)} al mes en sueldo base`;
+  const bs=Object.entries(bj).sort((a,b)=>b[1][0]-a[1][0]);const topN=bs.length?bs.filter(x=>x[1][0]===bs[0][1][0]).map(x=>x[0]):[];
+  view.innerHTML=`${lede}${note.length?`<p class="note">${note.join(' ')}</p>`:''}
+  ${nm?`<div class="kpis">
+    <div class="kpi"><div class="l">Costo total de nómina del mes</div><div class="v">${moneyC(pr.costo)}</div><div class="s">${u===CONS?'Incluye las 6 unidades':'&nbsp;'}</div></div>
+    <div class="kpi"><div class="l">Costo de nómina por comensal</div><div class="v">${sales&&pr.cxc?money(pr.cxc):'—'}</div><div class="s">${sales?'Por persona atendida':'Sin venta registrada'}</div></div>
+    <div class="kpi"><div class="l">Personas con pago en el mes</div><div class="v">${num(pr.hc)}</div><div class="s">${c.act} activas al ${corteNTxt}</div></div>
+    <div class="kpi"><div class="l">Rotación anualizada</div><div class="v ${c.rot>D.bench.rmax?'o':''}">${pct(c.rot,0)}</div><div class="s">${c.bajas} bajas, ${c.b3} con menos de 3 meses; sin traspasos</div></div>
+  </div>`:''}
+  ${sales||u===CONS?`<section class="block"><div class="bh"><h2 id="ntTitle"></h2><p>Proporción mensual de nómina sobre venta en 2026. La franja marca el rango de referencia de 25% a 30%.</p></div>
+    <div class="panel"><div id="nchart"></div><p class="src" id="nsrc"></p></div></section>`:''}
+  <section class="block"><div class="bh"><h2>${salTitle}</h2><p>Puestos activos de ${uName(u)} al ${corteNLargo}: sueldo base diario (SB) y costo mensual actual de cada puesto.</p></div>
+    <div class="panel"><div class="tscroll"><table class="st"><thead><tr><th class="hide-m">Nivel</th><th>Puesto</th><th class="r">#</th><th class="r">SB mediana</th><th class="r hide-m">SB promedio</th><th class="r">Costo mensual<span class="hide-m"> actual</span></th></tr></thead><tbody>
+    ${salShown.map((r,k)=>`<tr><td class="hide-m">${k===0||salShown[k-1].nv!==r.nv?`<span class="nvc nv${r.nv[1]}">${r.nv} · ${r.nl}</span>`:''}</td><td>${k===0||salShown[k-1].nv!==r.nv?`<span class="nvc nvm nv${r.nv[1]}">${r.nv} · ${r.nl}</span>`:''}<b style="font-weight:600">${r.p}</b></td><td class="r">${r.n}</td><td class="r">${money2(r.med)}</td><td class="r hide-m">${money2(r.avg)}</td><td class="r"><b style="font-weight:700;color:var(--navy)">${money(r.cost)}</b></td></tr>`).join('')}
+    <tr class="tot"><td class="hide-m">Total</td><td>${sal.length} puestos</td><td class="r">${totN}</td><td></td><td class="hide-m"></td><td class="r">${money(totC)}</td></tr></tbody></table></div>
+    ${sal.length>16?`<button class="more" id="more">${showAll?'Ver menos':'Ver los '+sal.length+' puestos'}</button>`:''}
+    <p class="src">SB: sueldo base diario, percepción de sueldo (P001) entre días pagados; no es el SBC. Costo mensual actual: SB × 30.4 días por persona; no incluye cargas IMSS e INFONAVIT, ISN ni prestaciones.</p></div></section>
+  <div class="two">
+  <section class="block"><div class="bh"><h2>Dónde está el costo: sueldo base por nivel</h2><p>Personas y costo mensual actual por nivel.</p></div>
+    <div class="panel">${lv.map(x=>`<div class="lv"><div class="code">${x.nv}</div><div class="nm">${x.nl}<div class="track"><div class="fill" style="width:${x.cost/mxc*100}%;background:var(--navy)"></div></div></div>
+      <div class="hc">${x.n}<small>personas</small></div><div class="pr">${moneyC(x.cost)}<small>${pct(x.cost/totC,0)} del costo</small></div></div>`).join('')}</div></section>
+  <section class="block"><div class="bh"><h2>${topN.length?`${topN.slice(0,2).join(' y ')} ${topN.length>1?'concentran':'concentra'} más bajas: ${bs[0][1][0]}${topN.length>1?' cada uno':''}`:'Sin bajas en el periodo'}</h2><p>Personas que ya no laboran en el grupo. No incluye ${c.tr} ${c.tr===1?'traspaso':'traspasos'} entre restaurantes.</p></div>
+    <div class="panel">${bs.length?`<table><thead><tr><th>Puesto</th><th class="r">Bajas</th><th class="r">Con menos de 3 meses</th></tr></thead><tbody>
+    ${bs.map(([p,v])=>`<tr><td><b style="font-weight:600">${p}</b></td><td class="r" style="${v[0]>=3?'color:var(--orange);font-weight:700':''}">${v[0]}</td><td class="r">${v[1]}</td></tr>`).join('')}
+    <tr class="tot"><td>Total</td><td class="r">${c.bajas}</td><td class="r">${c.b3}</td></tr></tbody></table>`:'<p class="subk" style="margin:0">No hay bajas registradas.</p>'}</div></section></div>`;
+
+  if($('more'))$('more').onclick=()=>{showAll=!showAll;renderNomina()};
+  if($('nchart')){
+    const series=nomMonths.map(mm=>{const r=prodOf(u,mm);return r&&r.pct!=null&&r.pct<1?r.pct:null});
+    const hl=nomMonths.indexOf(nm);const valid=series.filter(v=>v!=null);
+    const avg=valid.reduce((a,v)=>a+v,0)/valid.length;
+    $('ntTitle').textContent=valid.length?`En 2026 la nómina promedia ${pct(avg)} de la venta${avg<D.bench.min?', debajo del rango de referencia':avg<=D.bench.max?', dentro del rango de referencia':', arriba del rango de referencia'}`:'Nómina sobre venta';
+    lineChart($('nchart'),{labels:nomMonths.map(x=>cap(MES3[+x.slice(5)-1])),series:[{name:'Nómina / venta',values:series,color:'#00008A',hl:series[hl]!=null?hl:undefined}],
+      band:[D.bench.min,D.bench.max],bandLabel:'Rango de referencia',min:.10,max:.40,ticks:3,fy:v=>pct(v,0),ft:v=>pct(v),l:44,aria:'Nómina sobre venta mensual'});
+    const skipped=nomMonths.filter((mm,k)=>{const r=prodOf(u,mm);return r&&r.pct!=null&&r.pct>=1});
+    $('nsrc').textContent=(u===CONS?`Consolidado: la proporción se calcula solo con los restaurantes que registran venta (${SALES_U.map(i=>D.short[U[i]]).join(', ')}). `:'')+(skipped.length?`Se omite ${skipped.map(mLabel).join(', ')} por ser mes de apertura con venta parcial. `:'')+'Fuente: CFDI de nómina y base de venta diaria.';
+  }
+}
+
+buildFilters();refresh();
+let rt;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(refresh,150)});
+const g=new Date(D.generado);document.getElementById('upd').textContent='Actualizado el '+g.toLocaleString('es-MX',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+}
+fetch('data/data.json?v='+Date.now(),{cache:'no-store'})
+  .then(r=>{if(!r.ok)throw new Error(r.status);return r.json()})
+  .then(app)
+  .catch(e=>{document.getElementById('view').innerHTML='<div class="empty"><b>No se pudieron cargar los datos</b>Recarga la página en unos minutos. Si el problema sigue, avisa al administrador del tablero.</div>';console.error(e)});
+</script>
+</body>
+</html>
